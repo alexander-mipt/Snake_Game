@@ -50,7 +50,7 @@ protected:
     Direction temp_dir;
 
 private:
-    const int start_len = 1;
+    const int start_len = 6;
 };
 
 // Snake Segement (Coordinates + snake_id + move dir)
@@ -73,7 +73,7 @@ struct Rabbit : Coord, std::optional<int> {
 class Game {
 public:
     enum {
-        TICK = 200, // milliseconds game tick
+        TICK = 80, // milliseconds game tick
         RABBITS_CHANCE = 20, // 10% chance per game tick
         MAX_RABBITS = 10, // max rabbits on screen
     };

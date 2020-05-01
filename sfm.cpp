@@ -47,8 +47,8 @@ Window::Window() : pixel_size(P_SIZE) {
 
 void Window::set_screen_size() {
     sf::VideoMode fullscreen = sf::VideoMode::getDesktopMode();
-    int width = fullscreen.width;
-    int height = fullscreen.height;
+    int width = fullscreen.width - 25;
+    int height = fullscreen.height - 50;
 	width -= width % pixel_size;
 	height -= height % pixel_size;
 	//printf("w = %d, h = %d\n", width, height);
