@@ -59,6 +59,7 @@ private:
 
     bool running;
 	sf::VideoMode density;
+	sf::Clock clock;
 	
 	
 	

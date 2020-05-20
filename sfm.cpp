@@ -37,7 +37,7 @@ Window::Window() : pixel_size(P_SIZE) {
 	set_screen_size();
 	win.create(density, "Lesson");
     //sf::Sprite sp;
-
+    this->clock.restart();
 
 	
 	/*for (int i = 0; i < 500; i++)
@@ -45,6 +45,7 @@ Window::Window() : pixel_size(P_SIZE) {
             printf("here init\n");
             field[i][j] = sp;
         }*/
+    
 
 }
 
@@ -179,11 +180,6 @@ bool Window::read_event() {
  }
 
 void Window::run(Game& g) {
-    
-
-    
-    //int ii = 0;
-    
 
     running = true;
     while (running && win.isOpen()) {
@@ -197,19 +193,21 @@ void Window::run(Game& g) {
         win.clear();
         draw();
         
-        struct pollfd pfd[1] = {{ .fd = STDIN_FILENO, .events = POLLIN}};
         int msecs = -1;
 
-        if (!timers.empty())
+        if (!timers.empty()) {
             // on_timer() adds timers
             msecs = timers.front().first; 
             // returns the shortest time interval before next action
+        }
+            
+            this->clock.restart();
+            while (this->clock.getElapsedTime().asMilliseconds() <= msecs) {
+                read_event();
+                win.display();
+            }
 
-        struct timespec ta, tb;
-        clock_gettime(CLOCK_MONOTONIC, &ta);
-        poll(pfd, 1, msecs);
-        clock_gettime(CLOCK_MONOTONIC, &tb);
-        int elapsed = ( (tb.tv_sec - ta.tv_sec) * 1000 + (tb.tv_nsec - ta.tv_nsec) / 1000000 );
+        //int elapsed = ( (tb.tv_sec - ta.tv_sec) * 1000 + (tb.tv_nsec - ta.tv_nsec) / 1000000 );
 
         //if there are some time pueue:
         if (msecs != -1) {
@@ -217,16 +215,16 @@ void Window::run(Game& g) {
             auto f = i->second; // timer_fn (time action type)
 
             for (auto& t : timers)
-                t.first = std::max(0, t.first - elapsed); // reduce clock on every timer
+                t.first = std::max(0, t.first - this->clock.getElapsedTime().asMilliseconds()); // reduce clock on every timer
 
-            if (msecs <= elapsed) { // if there are no key_pressed
+            if (1) { // if there are no key_pressed
                 timers.erase(i);
                 f();
             }
         }
 
             
-        read_event();
+        
         win.display();
     }
 }
