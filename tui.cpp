@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <sys/poll.h>
 
+#include "time.h"
+
 Tty::Tty() {
   init_tty(0);
   winch();
