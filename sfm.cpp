@@ -20,6 +20,7 @@ Elem::Elem(const char name) : pixel_size(P_SIZE) {
 	}
 	
 	texture.loadFromImage(image);
+    //texture.setSrgb(true);
 	this->setTexture(texture);
     //sf::IntRect size = this->getTextureRect();
     //printf("size = %d\n", size.width);
@@ -59,6 +60,10 @@ void Window::set_screen_size() {
 
 
 void Window::place_pixel(int x, int y, int angle, sf::Sprite& pixel) {
+
+    x-=1;
+    y-=1;
+
 	pixel.setOrigin(pixel_size / 2, pixel_size / 2);
 	pixel.setRotation(90. * angle);
 	pixel.setPosition( (x + 0.5) * pixel_size , (y + 0.5) * pixel_size);
@@ -67,23 +72,42 @@ void Window::place_pixel(int x, int y, int angle, sf::Sprite& pixel) {
 	
 }
 
+sf::Color Window::int_to_color(unsigned int c) {
+    if (c == 1)
+        return sf::Color::Red;
+    switch(c % 5) {
+        case 0:
+        return sf::Color::Magenta;
+        case 1:
+        return sf::Color::Green;
+        case 2:
+        return sf::Color::Yellow;
+        case 3:
+        return sf::Color::Cyan;
+        case 4:
+        return sf::Color::Blue;
+    }
+
+    return sf::Color::White;
+}
+
 void Window::draw() {
     Elem brick('w');
     
-    for (int i = 0; i <= winx(); i++) {
-        this->place_pixel(i, 0, 0, brick);
+    for (int i = 1; i <= winx(); i++) {
+        this->place_pixel(i, 1, 0, brick);
         this->place_pixel(i, winy(), 0, brick);
     }
 
-    for (int i = 1; i <= winy() - 1; i++) {
-        this->place_pixel(0, i, 0, brick);
+    for (int i = 2; i <= winy() - 1; i++) {
+        this->place_pixel(1, i, 0, brick);
         this->place_pixel(winx(), i, 0, brick);
     }
 
-    for (int i = 0; i <= winx(); i++)
-        for (int j = 0; j <= winy(); j++) {
+    for (int i = 1; i <= winx(); i++)
+        for (int j = 1; j <= winy(); j++) {
             //printf("here in draw\n");
-            win.draw(field[i][j]);
+            win.draw(field[i-1][j-1]);
         }
 }
 
@@ -94,13 +118,15 @@ void Window::on_key(event_fn fn) {
 void Window::on_timer(int t, timer_fn fn) {
     timers.emplace_back(std::max(0,t), fn);
     std::sort(timers.begin(), timers.end(),
-            [] (const auto& a, const auto& b) { return a.first < b.first; } );
+            [] (const auto& a, const auto& b) { return a.first < b.first; } ); 
+            // в порядке возрастания времени
 }
 
 void Window::quit() {}
 
 void Window::painter(const Segment& body) {
     Elem* snake = new Elem('s');
+    snake->setColor(int_to_color(body.brand));
     int angle;
     if (body.dir <= 3) {
         snake->setTextureRect({0, 0, pixel_size, pixel_size});
@@ -173,7 +199,9 @@ void Window::run(Game& g) {
         int msecs = -1;
 
         if (!timers.empty())
-            msecs = timers.front().first;
+            // on_timer() adds timers
+            msecs = timers.front().first; 
+            // returns the shortest time interval before next action
 
         struct timespec ta, tb;
         clock_gettime(CLOCK_MONOTONIC, &ta);
@@ -181,14 +209,15 @@ void Window::run(Game& g) {
         clock_gettime(CLOCK_MONOTONIC, &tb);
         int elapsed = ( (tb.tv_sec - ta.tv_sec) * 1000 + (tb.tv_nsec - ta.tv_nsec) / 1000000 );
 
+        //if there are some time pueue:
         if (msecs != -1) {
-            auto i = timers.begin();
-            auto f = i->second;
+            auto i = timers.begin(); // first timer
+            auto f = i->second; // timer_fn (time action type)
 
             for (auto& t : timers)
-                t.first = std::max(0, t.first - elapsed);
+                t.first = std::max(0, t.first - elapsed); // reduce clock on every timer
 
-            if (msecs <= elapsed) {
+            if (msecs <= elapsed) { // if there are no key_pressed
                 timers.erase(i);
                 f();
             }

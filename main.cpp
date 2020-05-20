@@ -6,7 +6,7 @@
 
 int main() {
 
-  std::unique_ptr<Ui> v(Ui::get("tty"));
+  std::unique_ptr<Ui> v(Ui::get("sfm"));
   if (!v) {
     fprintf(stderr, "Cannot init UI\n");
     return 0;

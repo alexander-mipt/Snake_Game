@@ -32,8 +32,8 @@ public:
 	
 	/* Realization of virtual Ui methods */
 
-	int winx() const override { return density.width / pixel_size - 1; }
-  	int winy() const override { return density.height / pixel_size - 1; }
+	int winx() const override { return density.width / pixel_size; }
+  	int winy() const override { return density.height / pixel_size; }
 
   	void run(Game&) override;
 	void quit() override;
@@ -52,6 +52,7 @@ public:
 	
 	const int pixel_size;
 	void place_pixel(int x, int y, int angle, sf::Sprite& pixel);
+	sf::Color int_to_color(unsigned int);
 	
 	sf::RenderWindow win;
 private:
