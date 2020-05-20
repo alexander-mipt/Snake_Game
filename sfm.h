@@ -11,6 +11,9 @@
 
 #include "ui.h"
 
+#define TEXT_FIELDS 20 // 0, ... 17 - score; 18 , 19 - univ textbuffers
+#define FONT_SIZE 25
+
 class Elem : public sf::Sprite {
 public:
 	sf::Image image;
@@ -60,6 +63,8 @@ private:
     bool running;
 	sf::VideoMode density;
 	sf::Clock clock;
+	std::pair<int,sf::Text> txt[TEXT_FIELDS];
+	sf::Font fnt;
 	
 	
 	
@@ -70,6 +75,8 @@ private:
     std::vector<event_fn> events; // vector of key requests
     std::vector<std::pair<int, timer_fn>> timers; // vector of active timers
     sf::Sprite field[500][500];
+
+	std::vector<Elem*> rubbish;
 
 
 };

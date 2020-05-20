@@ -14,7 +14,7 @@ int main() {
 
   Game g;
   Human h(g);
-  Robot s1(g), s2(g), s3(g);
+  Robot s1(g), s2(g);//, s3(g);
 
   v->run(g);
 }

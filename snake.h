@@ -50,7 +50,7 @@ protected:
     Direction temp_dir;
 
 private:
-    const int start_len = 6;
+    const int start_len = 3;
 };
 
 // Snake Segement (Coordinates + snake_id + move dir)

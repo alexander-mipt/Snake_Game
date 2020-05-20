@@ -1,4 +1,6 @@
 #include "sfm.h"
+ 	
+#include <sstream>
 
 #include <signal.h>
 #include <unistd.h>
@@ -29,17 +31,29 @@ Elem::Elem(const char name) : pixel_size(P_SIZE) {
 }
 
 Elem::~Elem() {
-    //printf("I'm dyed %p\n", this);
+    //printf("Deleting Elem!\n");
+    //delete this;
 }
 
 Window::Window() : pixel_size(P_SIZE) {
 
 	set_screen_size();
-	win.create(density, "Lesson");
+	win.create(density, "Snake Game");
     //sf::Sprite sp;
     this->clock.restart();
 
-	
+    this->fnt.loadFromFile("arial.ttf");
+    txt[0].second.setFont(this->fnt);
+    txt[0].first = 1;
+    this->txt[0].second.setString("Score: ");
+    this->txt[0].second.setCharacterSize(FONT_SIZE);
+    this->txt[0].second.setFillColor(sf::Color::White);
+    for(int l = 1; l < TEXT_FIELDS; ++l) {
+        txt[l].second.setFont(this->fnt);
+        txt[l].second.setCharacterSize(FONT_SIZE);
+        txt[l].first = 0;
+    }
+
 	/*for (int i = 0; i < 500; i++)
         for (int j = 0; j < 500; j++) {
             printf("here init\n");
@@ -112,6 +126,24 @@ void Window::draw() {
             //printf("here in draw\n");
             win.draw(field[i-1][j-1]);
         }
+
+
+    sf::Vector2f banner = this->txt[0].second.getPosition();
+    sf::FloatRect score_rect = this->txt[0].second.getLocalBounds();
+    for (int y = 0; y < TEXT_FIELDS - 2; ++y) {
+        if (this->txt[y].first) {
+            sf::FloatRect txt_rect = this->txt[y].second.getLocalBounds();
+            if (y)
+                this->txt[y].second.setPosition(banner.x + score_rect.width + y * 5 * FONT_SIZE, banner.y);
+            sf::FloatRect txt_rect0 = this->txt[y].second.getLocalBounds();
+            sf::RectangleShape background(sf::Vector2f(txt_rect0.width * 2, txt_rect0.height * 1.5));
+            background.setFillColor(sf::Color::Black);
+            this->win.draw(background, txt[y].second.getTransform());
+            this->win.draw(txt[y].second);
+        }
+        
+    }
+    
 }
 
 void Window::on_key(event_fn fn) {
@@ -125,10 +157,24 @@ void Window::on_timer(int t, timer_fn fn) {
             // в порядке возрастания времени
 }
 
-void Window::quit() {}
+void Window::quit() {
+    int count = 0;
+    for (auto i : this->rubbish) {
+        if (i != nullptr) {
+            delete i;
+            i = nullptr;
+            //printf("%d) Deleted Dynamic object.\n", ++count);
+        }
+        
+        this->rubbish.clear();
+    }
+        
+   
+}
 
 void Window::painter(const Segment& body) {
     Elem* snake = new Elem('s');
+    this->rubbish.push_back(snake);
     snake->setColor(int_to_color(body.brand));
     int angle;
     if (body.dir <= 3) {
@@ -151,9 +197,18 @@ void Window::painter(const Segment& body) {
 
 void Window::painter(const Rabbit& xy) {
     Elem* rab = new Elem('r');
+    this->rubbish.push_back(rab);
     this->place_pixel(xy.first, xy.second, 0, *rab);
 }
-void Window::painter(int, int) {}
+void Window::painter(int brand, int score) {
+    std::ostringstream snake_str;    // объявили переменную
+	snake_str << score;
+    
+	this->txt[brand].second.setString(snake_str.str());
+    this ->txt[brand].second.setFillColor(int_to_color(brand));
+    this->txt[brand].first = 1;
+	
+}
 void Window::painter(const char* str, bool highlight) {}
 
 Window::~Window() {}
@@ -180,18 +235,21 @@ bool Window::read_event() {
  }
 
 void Window::run(Game& g) {
-
+    int kk = 0;
     running = true;
     while (running && win.isOpen()) {
+         
+        
         
         sf::Event event;
         while (win.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
+                this->quit();
                 win.close();
+            }
         }
 
-        win.clear();
-        draw();
+        
         
         int msecs = -1;
 
@@ -200,11 +258,15 @@ void Window::run(Game& g) {
             msecs = timers.front().first; 
             // returns the shortest time interval before next action
         }
+
+        win.clear();
+        draw();
             
             this->clock.restart();
             while (this->clock.getElapsedTime().asMilliseconds() <= msecs) {
+                
                 read_event();
-                win.display();
+                //win.display();
             }
 
         //int elapsed = ( (tb.tv_sec - ta.tv_sec) * 1000 + (tb.tv_nsec - ta.tv_nsec) / 1000000 );
@@ -226,5 +288,6 @@ void Window::run(Game& g) {
             
         
         win.display();
+       
     }
 }
