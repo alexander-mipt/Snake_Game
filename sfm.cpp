@@ -36,7 +36,9 @@ Window::Window() : pixel_size(P_SIZE) {
 
 	set_screen_size();
 	win.create(density, "Lesson");
-    sf::Sprite sp;
+    //sf::Sprite sp;
+
+
 	
 	/*for (int i = 0; i < 500; i++)
         for (int j = 0; j < 500; j++) {
