@@ -2,8 +2,8 @@
  	
 #include <sstream>
 
-#include <signal.h>
-#include <unistd.h>
+//#include <signal.h>
+//#include <unistd.h>
 
 #define P_SIZE 32
 
@@ -132,7 +132,6 @@ void Window::draw() {
     sf::FloatRect score_rect = this->txt[0].second.getLocalBounds();
     for (int y = 0; y < TEXT_FIELDS - 2; ++y) {
         if (this->txt[y].first) {
-            sf::FloatRect txt_rect = this->txt[y].second.getLocalBounds();
             if (y)
                 this->txt[y].second.setPosition(banner.x + score_rect.width + y * 5 * FONT_SIZE, banner.y);
             sf::FloatRect txt_rect0 = this->txt[y].second.getLocalBounds();
@@ -158,7 +157,7 @@ void Window::on_timer(int t, timer_fn fn) {
 }
 
 void Window::quit() {
-    int count = 0;
+    //int count = 0;
     for (auto i : this->rubbish) {
         if (i != nullptr) {
             delete i;
@@ -235,7 +234,7 @@ bool Window::read_event() {
  }
 
 void Window::run(Game& g) {
-    int kk = 0;
+    
     running = true;
     while (running && win.isOpen()) {
          

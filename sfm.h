@@ -1,13 +1,13 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
+//#include <SFML/Audio.hpp>
 #include <vector>
 
-#include <time.h> /////////////////
-#include <signal.h>
-#include <poll.h>
+//#include <time.h> /////////////////
+//#include <signal.h>
+//#include <poll.h>
 
-#include <cstdio>
+//#include <cstdio>
 
 #include "ui.h"
 
