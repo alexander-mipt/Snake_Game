@@ -1,12 +1,20 @@
 #include <memory>
 #include <cstdio>
+#include <cassert>
+#include <cstring>
 
 #include "ui.h"
 #include "control.h"
 
-int main() {
-
-  std::unique_ptr<Ui> v(Ui::get("tty"));
+int main(int argc, char** argv) {
+  assert(argc <= 2);
+  const char* interface = "tty";
+  if (argc == 2) {
+    interface = argv[1];
+    assert(!std::strcmp(interface, "tty") || !std::strcmp(interface, "sfm"));
+  }
+  // tty or sfm
+  std::unique_ptr<Ui> v(Ui::get(interface));
   if (!v) {
     fprintf(stderr, "Cannot init UI\n");
     return 0;
